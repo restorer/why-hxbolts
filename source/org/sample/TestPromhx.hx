@@ -108,18 +108,64 @@ class TestPromhx implements TestTask {
         });
     }
 
+    /*
+     * This version fails for neko:
+     *
+     * Variants.hx:20: OK : false / true / false / false / false / true
+     * Variants.hx:16: 1 / 2 / 1 ...
+     * Variants.hx:20: FAILURE : false / true / true / false / false / true
+     *
+     * and randomly (not every time) fails for flash:
+     *
+     * Variants.hx:16: 1 / 2 / 1 ...
+     * Variants.hx:20: OK : false / true / false / true / false / true
+     * Variants.hx:16: 1 / 2 / 2 ...
+     * Variants.hx:20: OK : false / true / false / false / false / true
+     * Variants.hx:20: OK : false / true / false / false / false / true
+     *
+    private function syncState() : Promise<Array<Void>> {
+        return sendApiRequest("sync-state").pipe(function(result : DynamicExt) : Promise<Array<Void>> {
+            var subPromises = new Array<Promise<Void>>();
+            Runner.updateStateFromTheResponse(result);
+
+            if (result.exists("playerAvatarUrl")) {
+                subPromises.push(fetchBitmapData(result["playerAvatarUrl"].asString()).then(function(bmd : BitmapData) : Void {
+                    Runner.setPlayerAvatar(bmd);
+                }));
+            }
+
+            if (result.exists("opponentAvatarUrl")) {
+                subPromises.push(fetchBitmapData(result["opponentAvatarUrl"].asString()).then(function(bmd : BitmapData) : Void {
+                    Runner.setOpponentAvatar(bmd);
+                }));
+            }
+
+            return Promise.whenAll(subPromises);
+        });
+    }
+
+    public function doTheTask() : Void {
+        Runner.showLoader();
+
+        syncState().then(function(_) : Void {
+            Runner.hideLoader();
+            Runner.onTaskSuccessed();
+        }).catchError(function(e : Dynamic) : Void {
+            Runner.hideLoader();
+            Runner.showErrorPopup();
+        });
+    }
+    */
+
+    // This version works:
     private function syncState() : Promise<Bool> {
-        // 1. unfortunately when error happened, catchError called immediately, and
-        // when several promises awaiting, than catchError handler can be called first,
-        // and promise can be resolved later. to fix it subPromises returns Bool now.
-
-        // 2. still must catch errors.
-
+        // without cast: promhx.base.AsyncBase<Bool> should be promhx.Promise<Bool>
         return cast sendApiRequest("sync-state").pipe(function(result : DynamicExt) : Promise<Bool> {
             var subPromises = new Array<Promise<Bool>>();
             Runner.updateStateFromTheResponse(result);
 
             if (result.exists("playerAvatarUrl")) {
+                // without cast: promhx.base.AsyncBase<Bool> should be promhx.Promise<Bool>
                 subPromises.push(cast fetchBitmapData(result["playerAvatarUrl"].asString()).then(function(bmd : BitmapData) : Bool {
                     Runner.setPlayerAvatar(bmd);
                     return true;
@@ -129,6 +175,7 @@ class TestPromhx implements TestTask {
             }
 
             if (result.exists("opponentAvatarUrl")) {
+                // without cast: promhx.base.AsyncBase<Bool> should be promhx.Promise<Bool>
                 subPromises.push(cast fetchBitmapData(result["opponentAvatarUrl"].asString()).then(function(bmd : BitmapData) : Bool {
                     Runner.setOpponentAvatar(bmd);
                     return true;
