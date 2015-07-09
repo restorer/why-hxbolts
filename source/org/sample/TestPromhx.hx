@@ -33,7 +33,6 @@ class TestPromhx implements TestTask {
         var urlLoader = new URLLoader();
 
         var onLoaderError = function(e : Event) : Void {
-            // dp.resolve() - ok, but why dp.throwError() instead of dp.reject() ?
             dp.throwError(e.type);
         };
 
@@ -49,7 +48,16 @@ class TestPromhx implements TestTask {
             urlLoader.load(new URLRequest(url));
         } catch (e : Dynamic) {
             // dp.throwError() will not actually throw an error if there is any error handlers
-            // (on it or on promise of it), but **will** throw in other case
+            // (on it or on promise of it), but **will** throw in other case.
+            //
+            // Exact test case: without Timer.delay() you'll get following exception for neko target:
+            //
+            // Variants.hx:20: OK : false / false / false / false / false / true
+            // Variants.hx:16: 8 / 1 / 1 ...
+            // Example urlloader error
+            // Called from promhx/base/AsyncBase.hx line 169
+            // ...
+
             Timer.delay(function() : Void {
                 dp.throwError(Std.string(e));
             }, 0);
@@ -101,13 +109,11 @@ class TestPromhx implements TestTask {
     }
 
     private function syncState() : Promise<Bool> {
-        // 1. if "then" instead of "pipe" - Type Coercion failed: cannot convert promhx::Promise to Array.
-
-        // 2. unfortunately when error happened, catchError called immediately, and
+        // 1. unfortunately when error happened, catchError called immediately, and
         // when several promises awaiting, than catchError handler can be called first,
         // and promise can be resolved later. to fix it subPromises returns Bool now.
 
-        // 3. still must catch errors.
+        // 2. still must catch errors.
 
         return cast sendApiRequest("sync-state").pipe(function(result : DynamicExt) : Promise<Bool> {
             var subPromises = new Array<Promise<Bool>>();

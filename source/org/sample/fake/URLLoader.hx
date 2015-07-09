@@ -16,7 +16,7 @@ class URLLoader extends EventDispatcher {
 
     public function load(urlRequest : URLRequest) : Void {
         if (Variants.urlLoaderVariant == URLLoaderVariant.ThrowError) {
-            throw 'Example error';
+            throw 'Example urlloader error';
         }
 
         Timer.delay(function() : Void {

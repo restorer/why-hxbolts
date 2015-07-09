@@ -85,7 +85,7 @@ class TestContinuation implements TestTask {
                 // }
 
                 // But this compiles successfully:
-                return fetchJsonTryCatcher(v);
+                // return fetchJsonTryCatcher(v);
             }
         }
     }

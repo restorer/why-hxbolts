@@ -24,7 +24,7 @@ class Loader {
         }
 
         if (loaderVariant == LoaderVariant.ThrowError) {
-            throw 'Example error';
+            throw 'Example loader error';
         }
 
         Timer.delay(function() : Void {
