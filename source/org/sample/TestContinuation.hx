@@ -65,15 +65,24 @@ class TestContinuation implements TestTask {
                 return Either.Left(v);
 
             case Right(v): {
-                /*
-                 * Compile error:
-                 *
-                try {
-                    return Either.Right(cast Json.parse(v));
-                } catch (e : Dynamic) {
-                    return Either.Left(Std.string(e));
-                }
-                */
+                //
+                // Compile error:
+                //
+                // try {
+                //     return Either.Right(cast Json.parse(v));
+                // } catch (e : Dynamic) {
+                //     return Either.Left(Std.string(e));
+                // }
+                //
+
+                //
+                // Suggected by Yang Bo, but didn't work either:
+                //
+                // return try {
+                //    return Either.Right(cast Json.parse(v));
+                // } catch (e : Dynamic) {
+                //    Either.Left(Std.string(e));
+                // }
 
                 // But this compiles successfully:
                 return fetchJsonTryCatcher(v);
