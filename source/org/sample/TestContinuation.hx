@@ -50,6 +50,28 @@ class TestContinuation implements TestTask {
         }
     }
 
+    // This variant is suggected by Yang Bo:
+    @:async
+    private function fetchJson(url : String) : Either<String, DynamicExt> {
+        return {
+            switch (@await fetchText(url)) {
+                case Left(v):
+                    Either.Left(v);
+
+                case Right(v): {
+                    try {
+                        Either.Right(cast Json.parse(v));
+                    } catch (e : Dynamic) {
+                        Either.Left(Std.string(e));
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Older vatiants:
+     *
     private function fetchJsonTryCatcher(v : DynamicExt) : Either<String, DynamicExt> {
         try {
             return Either.Right(cast Json.parse(v));
@@ -89,6 +111,7 @@ class TestContinuation implements TestTask {
             }
         }
     }
+    */
 
     private function fetchBitmapData(url : String, callback : Either<String, BitmapData> -> Void) : Void {
         var loader = new Loader();
