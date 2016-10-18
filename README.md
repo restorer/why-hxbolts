@@ -31,3 +31,16 @@ lime test neko -D<specify_compilation_flag>
   - `-Dtest_async` - compile tests for `async` library
   - `-Dtest_hextflow` - compile tests for `hext-flow` library
   - `-Dtest_hxbolts` - compile tests for `hxbolts library`
+
+# Product support
+
+This project was made to illustrate several blogpost. It has no other value.
+
+| Feature | Support status |
+|---|---|
+| New features | No |
+| Non-critical bugfixes | No |
+| Critical bugfixes | No |
+| Pull requests | Probably (it depends) |
+| Issues | Not monitored |
+| Estimated end-of-life | Already ended |
